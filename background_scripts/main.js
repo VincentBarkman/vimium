@@ -342,6 +342,22 @@ const BackgroundCommands = {
       }
     });
   },
+
+  hardReload({ count, tabId, tab: { windowId } }) {
+    // For hard reload set bypassCache to true
+    const bypassCache = true;
+    return chrome.tabs.query({ windowId }, function (tabs) {
+        let startIndex = tabs.findIndex(tab => tab.id === tabId);
+        if (startIndex === -1) return; // Exit if tabId is not found
+        
+        let processed = 0;
+        while (processed < count) {
+            chrome.tabs.reload(tabs[startIndex].id, { bypassCache });
+            processed++;
+            startIndex = (startIndex + 1) % tabs.length; // Wrap around if needed
+        }
+    });
+  }
 };
 
 const forCountTabs = (count, currentTab, callback) =>
